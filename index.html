@@ -253,10 +253,21 @@
     let ymmEnabled = true;
     let previewSelections = {};
     let storefrontSelections = {};
-    let searchPageFilters = {}; // Dynamically built based on results
+    let searchPageFilters = {}; // Applied filters for storefront results
+    let ymmBaselineFilters = {};
     let currentStorePage = "hp";
     let widgetPlacement = { sec: 's-hero', pos: 'bottom' };
     let editingId = null;
+    const filterBarConfig = [
+      { key: 'vendor', label: 'Shop by Vendor', source: 'vendor' },
+      { key: 'collection', label: 'Collection', source: 'collection' },
+      { key: 'year', label: 'Year', source: 'product.metafields.custom.vehicles_year' },
+      { key: 'make', label: 'Make', source: 'product.metafields.custom.vehicles_make' },
+      { key: 'model', label: 'Model', source: 'product.metafields.custom.vehicles_model' },
+      { key: 'sub', label: 'Sub', source: 'product.metafields.custom.vehicles_sub' },
+      { key: 'eng', label: 'Eng', source: 'product.metafields.custom.vehicles_eng' },
+      { key: 'trim', label: 'Trim', source: 'product.metafields.custom.vehicles_trim' }
+    ];
     const sourceLabelMap = {
       'product.metafields.custom.vehicles_year': 'Year',
       'product.metafields.custom.vehicles_make': 'Make',
@@ -280,6 +291,69 @@
       const set = new Set();
       products.forEach(p => getSourceValue(p, source).forEach(v => set.add(v)));
       return Array.from(set).sort();
+    }
+
+    function getFilterSource(key) {
+      const match = filterBarConfig.find(cfg => cfg.key === key);
+      return match ? match.source : null;
+    }
+
+    function getFilterValues(products, key) {
+      const source = getFilterSource(key);
+      if (!source) return [];
+      const set = new Set();
+      products.forEach(p => getSourceValue(p, source).forEach(v => set.add(v)));
+      return Array.from(set).sort();
+    }
+
+    function getProductsForFilterOptions(excludeKey) {
+      let products = [...mockProducts];
+      const combinedKeys = new Set([
+        ...Object.keys(ymmBaselineFilters),
+        ...Object.keys(searchPageFilters)
+      ]);
+      combinedKeys.forEach(key => {
+        if (key === excludeKey) return;
+        const baselineVal = ymmBaselineFilters[key];
+        const userVal = searchPageFilters[key];
+        const val = baselineVal && baselineVal.length ? baselineVal : userVal;
+        if (val && (Array.isArray(val) ? val.length : true)) {
+          products = products.filter(p => productMatchesFilter(p, key, val));
+        }
+      });
+      return products;
+    }
+
+    function productMatchesFilter(p, key, val) {
+      if (!val || (Array.isArray(val) && val.length === 0)) return true;
+      const source = getFilterSource(key);
+      if (!source) return true;
+      const values = Array.isArray(val) ? val : [val];
+      return values.some(v => getSourceValue(p, source).includes(v));
+    }
+
+    function sourceToFilterKey(source) {
+      if (source === 'vendor') return 'vendor';
+      if (source === 'collection') return 'collection';
+      if (source.endsWith('vehicles_year')) return 'year';
+      if (source.endsWith('vehicles_make')) return 'make';
+      if (source.endsWith('vehicles_model')) return 'model';
+      if (source.endsWith('vehicles_sub')) return 'sub';
+      if (source.endsWith('vehicles_eng')) return 'eng';
+      if (source.endsWith('vehicles_trim')) return 'trim';
+      return null;
+    }
+
+    function applyYmmToFilters() {
+      const nextFilters = {};
+      configuredOptions.forEach((opt, idx) => {
+        const selected = storefrontSelections[idx];
+        if (!selected) return;
+        const key = sourceToFilterKey(opt.source);
+        if (key) nextFilters[key] = [selected];
+      });
+      ymmBaselineFilters = nextFilters;
+      searchPageFilters = { ...nextFilters };
     }
 
     function getAvailableOptions(levelIdx, selections, pool = mockProducts) {
@@ -535,16 +609,18 @@
       const isYMMEnabled = ymmEnabled;
 
       let filteredProducts = [...mockProducts];
-      Object.keys(storefrontSelections).forEach(idx => {
-        const src = configuredOptions[idx].source;
-        const val = storefrontSelections[idx];
-        if (val) filteredProducts = filteredProducts.filter(p => getSourceValue(p, src).includes(val));
-      });
-
       if (!isHP) {
-        Object.keys(searchPageFilters).forEach(key => {
-          const val = searchPageFilters[key];
-          if (val) filteredProducts = filteredProducts.filter(p => p[key] === val);
+        const combinedKeys = new Set([
+          ...Object.keys(ymmBaselineFilters),
+          ...Object.keys(searchPageFilters)
+        ]);
+        combinedKeys.forEach(key => {
+          const baselineVal = ymmBaselineFilters[key];
+          const userVal = searchPageFilters[key];
+          const val = baselineVal && baselineVal.length ? baselineVal : userVal;
+          if (val && (Array.isArray(val) ? val.length : true)) {
+            filteredProducts = filteredProducts.filter(p => productMatchesFilter(p, key, val));
+          }
         });
       }
 
@@ -575,15 +651,50 @@
           </div>
         `;
       } else {
-        const dynamicVendors = [...new Set(filteredProducts.map(p => p.vendor))].sort();
-        const dynamicCollections = [...new Set(filteredProducts.map(p => p.collection))].sort();
-        frame.innerHTML = `<div class="max-w-7xl mx-auto space-y-8">${renderWidgetUI(mockProducts, false)}<div class="flex gap-10"><aside class="w-64 shrink-0 space-y-8"><div><h4 class="font-bold text-sm mb-4 border-b pb-2 uppercase tracking-wider text-gray-800">Shop by Vendor</h4><div class="space-y-2.5">${dynamicVendors.map(v => `<label class="flex items-center gap-2.5 cursor-pointer text-[13px]"><input type="checkbox" ${searchPageFilters.vendor === v ? 'checked' : ''} onchange="toggleSidebarFilter('vendor', '${v}')" class="w-4 h-4 rounded text-[#b60000] border-gray-300 focus:ring-0"><span class="${searchPageFilters.vendor === v ? 'text-[#b60000] font-semibold' : 'text-gray-600'}">${v}</span></label>`).join('')}${dynamicVendors.length === 0 ? '<p class="text-xs text-gray-400">No vendors available</p>' : ''}</div></div><div><h4 class="font-bold text-sm mb-4 border-b pb-2 uppercase tracking-wider text-gray-800">Collection</h4><div class="space-y-2.5">${dynamicCollections.map(c => `<label class="flex items-center gap-2.5 cursor-pointer text-[13px]"><input type="checkbox" ${searchPageFilters.collection === c ? 'checked' : ''} onchange="toggleSidebarFilter('collection', '${c}')" class="w-4 h-4 rounded text-[#b60000] border-gray-300 focus:ring-0"><span class="${searchPageFilters.collection === c ? 'text-[#b60000] font-semibold' : 'text-gray-600'}">${c}</span></label>`).join('')}${dynamicCollections.length === 0 ? '<p class="text-xs text-gray-400">No collections available</p>' : ''}</div></div></aside><div class="flex-1"><div class="flex items-center justify-between mb-8 pb-4 border-b"><div><h2 class="text-2xl font-bold text-gray-900">Vehicle Results</h2><p class="text-sm text-gray-500 mt-1">${filteredProducts.length} items found</p></div><div class="flex items-center gap-3"><span class="text-sm text-gray-500">Sort by:</span><select class="border-none bg-transparent text-sm font-semibold focus:ring-0 cursor-pointer"><option>Relevance</option><option>Price: Low to High</option><option>Price: High to Low</option></select></div></div><div class="grid grid-cols-4 gap-6">${filteredProducts.length > 0 ? filteredProducts.map(p => `<div class="bg-white border rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow"><div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-5xl"><i class="fas fa-image"></i></div><div class="p-4 flex-1 flex flex-col"><div class="text-[10px] text-red-600 font-bold mb-1 uppercase tracking-widest">${p.vendor}</div><div class="font-bold text-sm mb-4 h-10 overflow-hidden line-clamp-2">${p.title}</div><div class="mt-auto flex items-center justify-between pt-4 border-t"><span class="font-extrabold text-lg">$${(Math.random() * 100 + 50).toFixed(2)}</span><button class="bg-gray-900 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"><i class="fas fa-plus text-xs"></i></button></div></div></div>`).join('') : `<div class="col-span-4 py-32 text-center"><div class="text-5xl text-gray-200 mb-4"><i class="fas fa-search"></i></div><h3 class="text-lg font-bold text-gray-400">No exact matches found</h3><p class="text-sm text-gray-400">Try broadening your search criteria.</p></div>`}</div></div></div></div>`;
+        const filterSections = filterBarConfig.map(cfg => {
+          const baselineValues = ymmBaselineFilters[cfg.key] || [];
+          const selectedValues = baselineValues.length ? baselineValues : (searchPageFilters[cfg.key] || []);
+          const optionProducts = getProductsForFilterOptions(cfg.key);
+          const values = baselineValues.length
+            ? baselineValues
+            : getFilterValues(optionProducts, cfg.key);
+          const items = values.map(v => `
+            <label class="flex items-center gap-2.5 cursor-pointer text-[13px]">
+              <input type="checkbox" ${selectedValues.includes(v) ? 'checked' : ''} onchange="toggleSidebarFilter('${cfg.key}', '${v}')" class="w-4 h-4 rounded text-[#b60000] border-gray-300 focus:ring-0">
+              <span class="${selectedValues.includes(v) ? 'text-[#b60000] font-semibold' : 'text-gray-600'}">${v}</span>
+            </label>
+          `).join('');
+          return `
+            <div>
+              <h4 class="font-bold text-sm mb-4 border-b pb-2 uppercase tracking-wider text-gray-800">${cfg.label}</h4>
+              <div class="space-y-2.5">
+                ${items}${values.length === 0 ? '<p class="text-xs text-gray-400">No options available</p>' : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const selectedChips = filterBarConfig.flatMap(cfg => {
+          const baselineValues = ymmBaselineFilters[cfg.key] || [];
+          const values = baselineValues.length ? baselineValues : (searchPageFilters[cfg.key] || []);
+          return values.map(v => `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-[11px] rounded-full border">${cfg.label}: ${v}</span>`);
+        }).join('');
+
+        frame.innerHTML = `<div class="max-w-7xl mx-auto space-y-8">${renderWidgetUI(mockProducts, false)}<div class="flex gap-10"><aside class="w-64 shrink-0 space-y-8">${filterSections}</aside><div class="flex-1"><div class="flex items-center justify-between mb-8 pb-4 border-b"><div class="space-y-2"><div class="border border-gray-200 bg-white rounded-lg px-3 py-2 flex flex-wrap gap-2 min-h-[42px]">${selectedChips || '<span class="text-[11px] text-gray-400">No filters selected</span>'}</div><div class="text-[12px] text-gray-500">${filteredProducts.length} items found</div></div><div class="flex items-center gap-3"><span class="text-sm text-gray-500">Sort by:</span><select class="border-none bg-transparent text-sm font-semibold focus:ring-0 cursor-pointer"><option>Relevance</option><option>Price: Low to High</option><option>Price: High to Low</option></select></div></div><div class="grid grid-cols-4 gap-6">${filteredProducts.length > 0 ? filteredProducts.map(p => `<div class="bg-white border rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow"><div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-5xl"><i class="fas fa-image"></i></div><div class="p-4 flex-1 flex flex-col"><div class="text-[10px] text-red-600 font-bold mb-1 uppercase tracking-widest">${p.vendor}</div><div class="font-bold text-sm mb-4 h-10 overflow-hidden line-clamp-2">${p.title}</div><div class="mt-auto flex items-center justify-between pt-4 border-t"><span class="font-extrabold text-lg">$${(Math.random() * 100 + 50).toFixed(2)}</span><button class="bg-gray-900 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"><i class="fas fa-plus text-xs"></i></button></div></div></div>`).join('') : `<div class="col-span-4 py-32 text-center"><div class="text-5xl text-gray-200 mb-4"><i class="fas fa-search"></i></div><h3 class="text-lg font-bold text-gray-400">No exact matches found</h3><p class="text-sm text-gray-400">Try broadening your search criteria.</p></div>`}</div></div></div></div>`;
       }
     }
 
     function toggleSidebarFilter(type, value) {
-      if (searchPageFilters[type] === value) searchPageFilters[type] = null;
-      else searchPageFilters[type] = value;
+      const current = searchPageFilters[type] || [];
+      const baselineCurrent = ymmBaselineFilters[type] || [];
+      if (baselineCurrent.includes(value)) {
+        ymmBaselineFilters[type] = [];
+        searchPageFilters[type] = current.filter(v => v !== value);
+        renderStorefront();
+        return;
+      }
+      if (current.includes(value)) searchPageFilters[type] = current.filter(v => v !== value);
+      else searchPageFilters[type] = [...current, value];
       renderStorefront();
     }
 
@@ -608,7 +719,7 @@
           ${isHP ? `<button onclick="widgetPlacement=null; storefrontSelections={}; renderStorefront();" class="absolute -top-3 -right-3 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700"><i class="fas fa-times text-[10px]"></i></button>` : ''}
           <div class="flex items-center justify-between mb-5">
             <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-car-side text-red-600"></i> My Vehicle</h3>
-            <button onclick="storefrontSelections={}; searchPageFilters={}; renderStorefront();" class="text-[10px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider">Reset Selection</button>
+            <button onclick="storefrontSelections={}; renderStorefront();" class="text-[10px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider">Reset Selection</button>
           </div>
           <div class="grid grid-cols-4 gap-4">
             ${configuredOptions.map((opt, i) => {
@@ -633,6 +744,7 @@
     }
 
     function goToSearch() {
+      applyYmmToFilters();
       currentStorePage = 'search';
       renderStorefront();
     }
