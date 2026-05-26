@@ -353,7 +353,7 @@
         if (key) nextFilters[key] = [selected];
       });
       ymmBaselineFilters = nextFilters;
-      searchPageFilters = { ...nextFilters };
+      searchPageFilters = {};
     }
 
     function getAvailableOptions(levelIdx, selections, pool = mockProducts) {
@@ -652,10 +652,10 @@
         `;
       } else {
         const filterSections = filterBarConfig.map(cfg => {
+          const selectedValues = searchPageFilters[cfg.key] || [];
           const baselineValues = ymmBaselineFilters[cfg.key] || [];
-          const selectedValues = baselineValues.length ? baselineValues : (searchPageFilters[cfg.key] || []);
           const optionProducts = getProductsForFilterOptions(cfg.key);
-          const values = baselineValues.length
+          const values = baselineValues.length > 0
             ? baselineValues
             : getFilterValues(optionProducts, cfg.key);
           const items = values.map(v => `
@@ -675,8 +675,7 @@
         }).join('');
 
         const selectedChips = filterBarConfig.flatMap(cfg => {
-          const baselineValues = ymmBaselineFilters[cfg.key] || [];
-          const values = baselineValues.length ? baselineValues : (searchPageFilters[cfg.key] || []);
+          const values = searchPageFilters[cfg.key] || [];
           return values.map(v => `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-[11px] rounded-full border">${cfg.label}: ${v}</span>`);
         }).join('');
 
@@ -686,13 +685,6 @@
 
     function toggleSidebarFilter(type, value) {
       const current = searchPageFilters[type] || [];
-      const baselineCurrent = ymmBaselineFilters[type] || [];
-      if (baselineCurrent.includes(value)) {
-        ymmBaselineFilters[type] = [];
-        searchPageFilters[type] = current.filter(v => v !== value);
-        renderStorefront();
-        return;
-      }
       if (current.includes(value)) searchPageFilters[type] = current.filter(v => v !== value);
       else searchPageFilters[type] = [...current, value];
       renderStorefront();
