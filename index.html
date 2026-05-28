@@ -18,6 +18,23 @@
     .animate-fadeIn { animation: fadeIn 0.2s ease-in; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .rotate-270 { transform: rotate(-90deg); }
+
+    /* Row toggle switch (used for manual value include/exclude) */
+    .row-switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+    .row-switch input { opacity: 0; width: 0; height: 0; }
+    .row-switch .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background-color: #c9c9c9; border-radius: 999px; transition: .2s;
+    }
+    .row-switch .slider:before {
+      content: ""; position: absolute; height: 14px; width: 14px;
+      left: 2px; top: 2px; background-color: white; border-radius: 50%; transition: .2s;
+    }
+    .row-switch input:checked + .slider { background-color: #303030; }
+    .row-switch input:checked + .slider:before { transform: translateX(16px); }
+
+    /* Disabled (locked) form field look */
+    .field-locked { opacity: 0.55; pointer-events: none; cursor: not-allowed; background-color: #f3f3f4 !important; }
   </style>
 </head>
 <body class="bg-[#f6f6f7] text-[#303030] h-screen flex flex-col overflow-hidden">
@@ -58,24 +75,32 @@
     <!-- Content Area -->
     <main class="flex-1 overflow-y-auto scrollbar">
       <div id="mainContainer" class="p-8 max-w-[1200px] mx-auto">
-        
+
         <!-- YMM DASHBOARD -->
         <div id="view-dashboard" class="view-content animate-fadeIn">
           <h1 class="text-[20px] font-semibold">Year Make Model</h1>
-              <p class="text-[12px] text-[#6d7175] mt-1">Year Make Model Guideline <span class="font-semibold underline">here</span></p>
-          
-          <div class="mb-4 bg-[#e7f1fb] border border-[#b1d1ee] rounded-lg overflow-hidden" id="notificationBox">
-            <button onclick="toggleNotification()" class="w-full flex items-center justify-between p-3 text-[13px] font-medium text-[#084e8a] hover:bg-[#d9e9f9]">
+          <p class="text-[12px] text-[#6d7175] mt-1">Year Make Model Guideline <span class="font-semibold underline">here</span></p>
+
+          <!-- Notification box: white bg, black text, expanded by default, extra top spacing -->
+          <div class="mt-6 mb-4 bg-white border border-[#e2e2e5] rounded-lg overflow-hidden shadow-sm" id="notificationBox">
+            <button onclick="toggleNotification()" class="w-full flex items-center justify-between p-3 text-[13px] font-medium text-[#303030] hover:bg-[#f6f6f7]">
               <div class="flex items-center gap-2">
                 <i class="fas fa-info-circle"></i>
                 <span>Important: How to set up your Year Make Model search</span>
               </div>
-              <i class="fas fa-chevron-down transition-transform" id="notiChevron"></i>
+              <i class="fas fa-chevron-up transition-transform" id="notiChevron"></i>
             </button>
-            <div id="notiContent" class="hidden px-10 pb-4 text-[13px] text-[#084e8a] space-y-2">
-              <p>1. Ensure your products have the corresponding metafields assigned.</p>
-              <p>2. Add the YMM options in the list below to match your product attributes.</p>
-              <p>3. Use the preview on the right to see how it will appear to your customers.</p>
+            <div id="notiContent" class="px-10 pb-4 text-[13px] text-[#303030] space-y-3">
+              <p><span class="font-semibold">Step 1:</span> Enabled Year Make Model by switch button below</p>
+              <p><span class="font-semibold">Step 2:</span> Go to Theme Editor &gt; HomePage &gt; Add Section &gt; Apps &gt; Year Make Model &gt; Save</p>
+              <div>
+                <button onclick="showToast('Opening Theme Editor...')" class="bg-black text-white px-3 py-1.5 rounded text-[12px] font-medium hover:bg-[#1a1a1a]">
+                  Add YMM Widget in Theme Editor
+                </button>
+              </div>
+              <p><span class="font-semibold">Step 3:</span> Ensure your products have the corresponding metafields assigned.</p>
+              <p><span class="font-semibold">Step 4:</span> Add the YMM options in the list below to match your product attributes.</p>
+              <p><span class="font-semibold">Step 5:</span> Use the preview on the right to see how it will appear to your customers.</p>
             </div>
           </div>
 
@@ -113,9 +138,11 @@
 
             <div class="col-span-4">
               <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm sticky top-6 overflow-hidden">
-                <div class="p-4 border-b bg-gray-50 font-semibold text-[14px]">Admin Preview</div>
+                <!-- Preview header: centered, with separator below -->
+                <div class="p-4 bg-gray-50 font-semibold text-[14px] text-center">Preview</div>
+                <div class="border-b border-[#e2e2e5]"></div>
                 <div class="p-5" id="previewContainer">
-                  <div id="previewDisabled" class="hidden flex flex-col items-center py-10 text-center">
+                  <div id="previewDisabled" class="hidden flex-col items-center py-10 text-center">
                     <p class="text-[12px] text-gray-500">Widget is disabled</p>
                   </div>
                   <div id="previewEnabled" class="space-y-4"></div>
@@ -198,19 +225,11 @@
                 <div id="sourceDetails" class="grid grid-cols-2 gap-4 pt-1">
                   <div>
                     <label class="block text-[13px] font-medium text-[#303030] mb-1.5">Label</label>
-                    <input type="text" id="fieldLabel" class="w-full border border-[#d1d1d1] rounded px-3 py-2 text-[13px] outline-none">
+                    <input type="text" id="fieldLabel" class="w-full border border-[#d1d1d1] rounded px-3 py-2 text-[13px] outline-none field-locked">
                   </div>
                   <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                      <label class="block text-[13px] font-medium text-[#303030]">Values</label>
-                      <div class="flex items-center gap-2 text-[12px] text-[#6d7175]">
-                        <span>Sort</span>
-                        <select id="valueSortSelect" class="border border-[#d1d1d1] rounded px-2 py-1 bg-white text-[12px]">
-                          <option value="az">A-Z</option>
-                        </select>
-                      </div>
-                    </div>
-                    <select id="valueTypeSelect" onchange="handleValueTypeChange()" class="w-full border border-[#d1d1d1] rounded px-3 py-2 text-[13px] outline-none">
+                    <label class="block text-[13px] font-medium text-[#303030] mb-1.5">Values</label>
+                    <select id="valueTypeSelect" onchange="handleValueTypeChange()" class="w-full border border-[#d1d1d1] rounded px-3 py-2 text-[13px] outline-none field-locked">
                       <option value="all">Use all values</option>
                       <option value="manual">Manual Selection</option>
                     </select>
@@ -220,12 +239,9 @@
             </div>
 
             <div id="manualSelectionBox" class="hidden bg-white border border-[#e2e2e5] rounded-lg shadow-sm overflow-hidden">
-              <div class="p-4 border-b border-[#f1f1f1] bg-[#f9f9f9] flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium text-[13px]">Select Values</h3>
-                  <p class="text-[12px] text-[#6d7175]">Choose and reorder values.</p>
-                </div>
-                <span class="text-[12px] text-[#8c9196]">Drag to reorder</span>
+              <div class="p-4 border-b border-[#f1f1f1] bg-[#f9f9f9]">
+                <h3 class="font-medium text-[13px]">Select Values</h3>
+                <p class="text-[12px] text-[#6d7175]">Include/Exclude and Drag to reorder values</p>
               </div>
               <div class="max-h-[300px] overflow-y-auto scrollbar p-2" id="valuesListContainer"></div>
             </div>
@@ -253,7 +269,7 @@
     let ymmEnabled = true;
     let previewSelections = {};
     let storefrontSelections = {};
-    let searchPageFilters = {}; // Applied filters for storefront results
+    let searchPageFilters = {};
     let ymmBaselineFilters = {};
     let currentStorePage = "hp";
     let widgetPlacement = { sec: 's-hero', pos: 'bottom' };
@@ -381,7 +397,13 @@
     }
 
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-collapsed'); }
-    function toggleNotification() { document.getElementById('notiContent').classList.toggle('hidden'); }
+    function toggleNotification() {
+      const content = document.getElementById('notiContent');
+      const chevron = document.getElementById('notiChevron');
+      content.classList.toggle('hidden');
+      chevron.classList.toggle('fa-chevron-up');
+      chevron.classList.toggle('fa-chevron-down');
+    }
     function showToast(msg) {
       const container = document.getElementById('toastContainer');
       const t = document.createElement('div');
@@ -416,14 +438,24 @@
       `).join('');
     }
 
+    // Build Search button — black bg, white text, faded until at least one selection
+    function renderSearchButton(selections, onclickAttr) {
+      const hasSelection = Object.values(selections).some(v => v);
+      const fadedClass = hasSelection ? '' : 'opacity-40 cursor-not-allowed';
+      const disabledAttr = hasSelection ? '' : 'disabled';
+      return `<button ${onclickAttr} ${disabledAttr} class="bg-black text-white py-2.5 px-4 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors ${fadedClass}">SEARCH</button>`;
+    }
+
     function updateAdminPreview() {
       const isEnabled = ymmEnabled;
       document.getElementById('enableToggle').checked = isEnabled;
-      document.getElementById('previewDisabled').classList.toggle('hidden', isEnabled);
+      const disabledEl = document.getElementById('previewDisabled');
+      disabledEl.classList.toggle('hidden', isEnabled);
+      disabledEl.classList.toggle('flex', !isEnabled);
       const container = document.getElementById('previewEnabled');
       container.classList.toggle('hidden', !isEnabled);
       if (!isEnabled) return;
-      container.innerHTML = configuredOptions.map((opt, i) => {
+      const dropdowns = configuredOptions.map((opt, i) => {
         const active = i === 0 || previewSelections[i-1] !== undefined;
         const options = active ? getAvailableOptions(i, previewSelections, mockProducts) : [];
         return `
@@ -431,11 +463,15 @@
             <label class="text-[11px] font-bold text-gray-400 uppercase tracking-tight">${opt.label}</label>
             <select onchange="handleAdminPreviewChange(${i}, this.value)" ${!active ? 'disabled' : ''} class="w-full border rounded-lg px-2 py-2 text-[12px] bg-white outline-none disabled:bg-gray-50">
               <option value="">Select ${opt.label}</option>
-              ${options.map(o => `<option value="${o}" ${previewSelections[i] === o ? 'selected' : ''}>${o}</option>`).join('')}
+              ${options.length === 0 ? '<option value="" disabled>No options available</option>' : options.map(o => `<option value="${o}" ${previewSelections[i] === o ? 'selected' : ''}>${o}</option>`).join('')}
             </select>
           </div>
         `;
-      }).join('') + `<button class="w-full bg-[#b60000] text-white py-2 rounded text-[12px] font-bold mt-2 uppercase">Search</button>`;
+      }).join('');
+      container.innerHTML = dropdowns + `<div class="pt-2">${renderSearchButton(previewSelections, 'onclick="showToast(\'Search (preview)\')"')}</div>`.replace('renderSearchButton', 'renderSearchButton');
+      // Force full-width button in narrow preview
+      const lastBtn = container.querySelector('button');
+      if (lastBtn) lastBtn.classList.add('w-full');
     }
 
     function handleAdminPreviewChange(idx, val) {
@@ -473,15 +509,18 @@
       const listToRender = [...currentSelection];
       allPossible.forEach(v => { if (!listToRender.includes(v)) listToRender.push(v); });
       listToRender.forEach(val => {
-        const isChecked = currentSelection.length === 0 || currentSelection.includes(val);
+        const isOn = currentSelection.length === 0 || currentSelection.includes(val);
         const item = document.createElement('div');
         item.className = "flex items-center gap-3 p-2 hover:bg-gray-50 border-b draggable-value cursor-move bg-white";
         item.draggable = true;
         item.dataset.value = val;
         item.innerHTML = `
           <i class="fas fa-grip-vertical text-gray-300 text-xs"></i>
-          <input type="checkbox" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded text-[#008060]">
-          <span class="text-[13px]">${val}</span>
+          <span class="text-[13px] flex-1">${val}</span>
+          <label class="row-switch shrink-0">
+            <input type="checkbox" ${isOn ? 'checked' : ''}>
+            <span class="slider"></span>
+          </label>
         `;
         container.appendChild(item);
         item.addEventListener('dragstart', () => item.classList.add('dragging-val'));
@@ -511,7 +550,8 @@
       const label = document.getElementById('fieldLabel').value;
       const source = document.getElementById('fieldSource').value;
       const type = document.getElementById('valueTypeSelect').value;
-      if (!label || !source) return;
+      if (!source) { showToast('Please choose a Source first'); return; }
+      if (!label) { showToast('Label is required'); return; }
       let customValues = [];
       if (type === 'manual') {
         const rows = document.querySelectorAll('#valuesListContainer .draggable-value');
@@ -525,6 +565,15 @@
       showToast("Settings saved");
     }
 
+    function setLabelValueLocked(locked) {
+      const labelEl = document.getElementById('fieldLabel');
+      const valEl = document.getElementById('valueTypeSelect');
+      labelEl.classList.toggle('field-locked', locked);
+      valEl.classList.toggle('field-locked', locked);
+      labelEl.disabled = locked;
+      valEl.disabled = locked;
+    }
+
     function showAddView() {
       editingId = null;
       document.getElementById('formTitle').innerText = "Add Year Make Model Option";
@@ -533,6 +582,7 @@
       document.getElementById('valueTypeSelect').value = "all";
       document.getElementById('manualSelectionBox').classList.add('hidden');
       refreshSourceDropdown();
+      setLabelValueLocked(true); // Lock until Source picked
       switchView('add-option');
     }
 
@@ -543,6 +593,7 @@
       document.getElementById('fieldLabel').value = opt.label;
       document.getElementById('fieldSource').value = opt.source;
       document.getElementById('valueTypeSelect').value = opt.type || "all";
+      setLabelValueLocked(false); // editing always unlocked since Source exists
       handleSourceChange(true);
       handleValueTypeChange();
       switchView('add-option');
@@ -565,6 +616,7 @@
     function handleSourceChange(skipLabelUpdate = false) {
       const source = document.getElementById('fieldSource').value;
       if (source && !skipLabelUpdate) document.getElementById('fieldLabel').value = sourceLabelMap[source] || document.getElementById('fieldLabel').value;
+      setLabelValueLocked(!source);
       refreshSourceDropdown();
       if (document.getElementById('valueTypeSelect').value === 'manual') renderManualValuesList();
     }
@@ -603,7 +655,7 @@
           ${p.name}
         </div>
       `).join('');
-      
+
       const frame = document.getElementById('storefrontIframe');
       const isHP = currentStorePage === 'hp';
       const isYMMEnabled = ymmEnabled;
@@ -704,8 +756,26 @@
 
     function placeWidget(sec, pos) { widgetPlacement = { sec, pos }; renderStorefront(); }
 
+    // Storefront widget — max 4 dropdowns per row, then wrap. Search btn black/white, faded until selection.
     function renderWidgetUI(pool, isHP) {
-      const btnText = "SEARCH";
+      const hasSelection = Object.values(storefrontSelections).some(v => v);
+      const fadedClass = hasSelection ? '' : 'opacity-40 cursor-not-allowed';
+      const disabledAttr = hasSelection ? '' : 'disabled';
+
+      const dropdowns = configuredOptions.map((opt, i) => {
+        const active = i === 0 || storefrontSelections[i-1] !== undefined;
+        const options = active ? getAvailableOptions(i, storefrontSelections, pool) : [];
+        return `
+          <div class="space-y-1.5 text-left">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">${opt.label}</label>
+            <select onchange="handleStorefrontChange(${i}, this.value)" ${!active ? 'disabled' : ''} class="w-full border-gray-200 border rounded-xl px-3 py-2.5 text-[12px] bg-white outline-none focus:ring-2 focus:ring-red-100 disabled:bg-gray-50 transition-all cursor-pointer">
+              <option value="">Choose ${opt.label}</option>
+              ${options.length === 0 ? '<option value="" disabled>No options available</option>' : options.map(o => `<option value="${o}" ${storefrontSelections[i] === o ? 'selected' : ''}>${o}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }).join('');
+
       return `
         <div class="bg-white border-2 border-[#b60000] p-6 rounded-2xl shadow-2xl relative animate-fadeIn w-full text-[#303030]">
           ${isHP ? `<button onclick="widgetPlacement=null; storefrontSelections={}; renderStorefront();" class="absolute -top-3 -right-3 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700"><i class="fas fa-times text-[10px]"></i></button>` : ''}
@@ -713,22 +783,10 @@
             <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-car-side text-red-600"></i> My Vehicle</h3>
             <button onclick="storefrontSelections={}; renderStorefront();" class="text-[10px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider">Reset Selection</button>
           </div>
-          <div class="grid grid-cols-4 gap-4">
-            ${configuredOptions.map((opt, i) => {
-              const active = i === 0 || storefrontSelections[i-1] !== undefined;
-              const options = active ? getAvailableOptions(i, storefrontSelections, pool) : [];
-              return `
-                <div class="space-y-1.5 text-left">
-                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">${opt.label}</label>
-                  <select onchange="handleStorefrontChange(${i}, this.value)" ${!active ? 'disabled' : ''} class="w-full border-gray-200 border rounded-xl px-3 py-2.5 text-[12px] bg-white outline-none focus:ring-2 focus:ring-red-100 disabled:bg-gray-50 transition-all cursor-pointer">
-                    <option value="">Choose ${opt.label}</option>
-                    ${options.map(o => `<option value="${o}" ${storefrontSelections[i] === o ? 'selected' : ''}>${o}</option>`).join('')}
-                  </select>
-                </div>
-              `;
-            }).join('')}
-            <div class="flex items-end">
-              <button onclick="goToSearch()" class="w-full bg-[#b60000] text-white py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-red-800 transition-colors shadow-lg shadow-red-100">${btnText}</button>
+          <div class="grid grid-cols-4 gap-4 items-end">
+            ${dropdowns}
+            <div>
+              <button onclick="goToSearch()" ${disabledAttr} class="w-full bg-black text-white py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors shadow-lg ${fadedClass}">SEARCH</button>
             </div>
           </div>
         </div>
@@ -736,6 +794,8 @@
     }
 
     function goToSearch() {
+      const hasSelection = Object.values(storefrontSelections).some(v => v);
+      if (!hasSelection) return;
       applyYmmToFilters();
       currentStorePage = 'search';
       renderStorefront();
