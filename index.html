@@ -79,12 +79,13 @@
         <!-- YMM DASHBOARD -->
         <div id="view-dashboard" class="view-content animate-fadeIn">
           <h1 class="text-[20px] font-semibold">Year Make Model</h1>
-          <p class="text-[12px] text-[#6d7175] mt-1">Year Make Model Guideline <span class="font-semibold underline">here</span></p>
+          <p class="text-[12px] text-[#6d7175] mt-1">Year Make Model Guideline <a href="#" class="text-blue-600 underline">here</a></p>
+          <p class="text-[12px] text-[#6d7175] mt-1">If you need help with Year Make Model set up, <a href="#" class="text-blue-600 underline font-semibold">contact us</a></p>
 
-          <!-- Enable Year Make Model toggle (moved above notification box) -->
+          <!-- Enable Year Make Model Search toggle box -->
           <div class="mt-6 bg-white border border-[#e2e2e5] rounded-lg p-4 mb-4 flex items-center justify-between shadow-sm">
             <div>
-              <div class="font-medium text-[14px]">Enable Year Make Model</div>
+              <div class="font-medium text-[14px]">Enable Year Make Model Search</div>
               <p class="text-[12px] text-[#6d7175]">Turn on to display the search widget on your storefront.</p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
@@ -93,51 +94,8 @@
             </label>
           </div>
 
-          <!-- Notification box: Quick Setup Guide -->
-          <div class="mb-6 bg-white border border-[#e2e2e5] rounded-lg overflow-hidden shadow-sm" id="notificationBox">
-            <button onclick="toggleNotification()" class="w-full flex items-center justify-between p-3 text-[13px] font-medium text-[#303030] hover:bg-[#f6f6f7]">
-              <div class="flex items-center gap-2">
-                <i class="fas fa-info-circle"></i>
-                <span>Important: Quick Setup Guide for Year Make Model Search</span>
-              </div>
-              <i class="fas fa-chevron-up transition-transform" id="notiChevron"></i>
-            </button>
-            <div id="notiContent" class="px-10 pb-5 pt-1 text-[13px] text-[#303030] grid grid-cols-1 md:grid-cols-2 gap-6 divide-y md:divide-y-0 md:divide-x divide-[#e2e2e5]">
-              <div class="space-y-2 pt-4 md:pt-0 md:pr-6">
-                <p class="font-semibold text-[14px]">1. Add YMM Widget to Your Store <a href="#" class="text-blue-600 underline font-normal text-[13px]">(Guideline here)</a></p>
-                <p class="pl-3"><span class="font-semibold">Step 1:</span> Enable Year Make Model</p>
-                <div class="pl-3">
-                  <p class="mb-1"><span class="font-semibold">Step 2:</span> Choose Applied Theme:</p>
-                  <select id="themeSelect" class="border border-[#e2e2e5] rounded px-2 py-1.5 text-[13px] bg-white min-w-[220px] focus:outline-none focus:border-[#303030]">
-                    <option value="">Choose your theme</option>
-                    <option value="dawn">Dawn (Live)</option>
-                    <option value="horizon">Horizon</option>
-                    <option value="eclit">Eclit</option>
-                    <option value="craft">Craft</option>
-                    <option value="sense">Sense</option>
-                    <option value="studio">Studio</option>
-                  </select>
-                </div>
-                <p class="pl-3"><span class="font-semibold">Step 3:</span> Add the YMM widget:<br>
-                  <span class="text-[#6d7175]">Theme Editor → Homepage → Add Section → Apps → Year Make Model → Save</span>
-                </p>
-                <div class="pl-3 pt-1">
-                  <button onclick="showToast('Opening Theme Editor...')" class="bg-black text-white px-3 py-1.5 rounded text-[12px] font-medium hover:bg-[#1a1a1a]">
-                    Add YMM Widget
-                  </button>
-                </div>
-              </div>
-              <div class="space-y-2 pt-4 md:pt-0 md:pl-6">
-                <p class="font-semibold text-[14px]">2. Configure YMM Options <a href="#" class="text-blue-600 underline font-normal text-[13px]">(Guideline here)</a></p>
-                <p class="pl-3"><span class="font-semibold">Step 1:</span> Assign the correct attribute sources to your products.</p>
-                <p class="pl-3"><span class="font-semibold">Step 2:</span> Add your Year / Make / Model options below.</p>
-                <p class="pl-3"><span class="font-semibold">Step 3:</span> Check the live preview on the right.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-12 gap-6">
-            <div class="col-span-8 space-y-6">
+          <div class="grid grid-cols-12 gap-6 mt-6">
+            <div class="col-span-8 space-y-4">
               <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm flex flex-col">
                 <div class="p-4 border-b flex items-center justify-between">
                   <h2 class="font-semibold text-[14px]">YMM Options</h2>
@@ -155,12 +113,58 @@
                   <tbody id="ymmTableBody"></tbody>
                 </table>
               </div>
-              <p class="text-[12px] text-[#6d7175] mt-2">If you need help with YMM set up, <a href="#" class="text-blue-600 underline font-semibold">contact us</a></p>
+
+              <!-- Collapsible setup guide (same width as YMM Options) -->
+              <div class="bg-white border border-[#e2e2e5] rounded-lg overflow-hidden shadow-sm" id="notificationBox">
+                <button onclick="toggleNotification()" class="w-full flex items-center justify-between p-3 text-[13px] font-medium text-[#303030] hover:bg-[#f6f6f7]">
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Important: Add Year Make Model Widget to your store <a href="#" onclick="event.stopPropagation()" class="text-blue-600 underline font-normal">(Guideline here)</a></span>
+                  </div>
+                  <i class="fas fa-chevron-up transition-transform" id="notiChevron"></i>
+                </button>
+                <div id="notiContent" class="px-6 pb-5 pt-2 text-[13px] text-[#303030] grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Left: text steps -->
+                  <div class="space-y-3" style="margin-top: 0px;">
+                    <div>
+                      <p class="font-semibold mb-1.5">Step 1: Choose Applied Theme</p>
+                      <select id="themeSelect" class="border border-[#e2e2e5] rounded px-2 py-1.5 text-[13px] bg-white w-full max-w-[260px] focus:outline-none focus:border-[#303030]">
+                        <option value="">Choose your theme</option>
+                        <option value="dawn">Dawn (Live)</option>
+                        <option value="horizon">Horizon</option>
+                        <option value="eclit">Eclit</option>
+                        <option value="craft">Craft</option>
+                        <option value="sense">Sense</option>
+                        <option value="studio">Studio</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div class="ai-style-change-4" style="margin-top: 2rem;"> 
+                      <p class="font-semibold mb-1">Step 2: Add Widget:</p>
+                      <p class="text-[#6d7175] mb-2">Enter Theme Editor → Homepage → Add Section → Apps → Year Make Model → Save</p>
+                      <button onclick="showToast('Opening Theme Editor...')" class="bg-black text-white px-3 py-1.5 rounded text-[12px] font-medium hover:bg-[#1a1a1a]">
+                        Add Year Make Model Widget
+                      </button>
+                    </div>
+                    </div>
+                  </div>
+                  <!-- Right: expandable image -->
+                  <div class="flex md:justify-end">
+                    <button type="button" onclick="openImageModal()" class="group relative aspect-square w-full max-w-[260px] rounded-lg overflow-hidden border border-[#e2e2e5] bg-gray-50 hover:border-[#303030] transition-colors">
+                      <img src="theme-editor-guide.jpg" alt="Theme editor guide" class="w-full h-full object-cover">
+                      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full w-10 h-10 flex items-center justify-center shadow">
+                          <i class="fas fa-expand text-[#303030]"></i>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="col-span-4">
               <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm sticky top-6 overflow-hidden">
-                <!-- Preview header: centered, with separator below -->
                 <div class="p-4 bg-gray-50 font-semibold text-[14px] text-center">Preview</div>
                 <div class="border-b border-[#e2e2e5]"></div>
                 <div class="p-5" id="previewContainer">
@@ -171,6 +175,16 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Image modal -->
+        <div id="imageModal" class="hidden fixed inset-0 z-[70] bg-black/70 flex items-center justify-center p-6" onclick="closeImageModal()">
+          <div class="relative max-w-5xl w-full" onclick="event.stopPropagation()">
+            <button onclick="closeImageModal()" class="absolute -top-3 -right-3 bg-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100">
+              <i class="fas fa-times text-[#303030]"></i>
+            </button>
+            <img src="theme-editor-guide.jpg" alt="Theme editor guide" class="w-full h-auto rounded-lg shadow-2xl">
           </div>
         </div>
 
@@ -472,10 +486,9 @@
       const isEnabled = ymmEnabled;
       document.getElementById('enableToggle').checked = isEnabled;
       const disabledEl = document.getElementById('previewDisabled');
-      disabledEl.classList.toggle('hidden', isEnabled);
-      disabledEl.classList.toggle('flex', !isEnabled);
-      const container = document.getElementById('previewEnabled');
-      container.classList.toggle('hidden', !isEnabled);
+      const enabledEl = document.getElementById('previewEnabled');
+      if (disabledEl) disabledEl.classList.toggle('hidden', isEnabled);
+      if (enabledEl) enabledEl.classList.toggle('hidden', !isEnabled);
       if (!isEnabled) return;
       const dropdowns = configuredOptions.map((opt, i) => {
         const active = i === 0 || previewSelections[i-1] !== undefined;
@@ -490,9 +503,8 @@
           </div>
         `;
       }).join('');
-      container.innerHTML = dropdowns + `<div class="pt-2">${renderSearchButton(previewSelections, 'onclick="showToast(\'Search (preview)\')"')}</div>`.replace('renderSearchButton', 'renderSearchButton');
-      // Force full-width button in narrow preview
-      const lastBtn = container.querySelector('button');
+      enabledEl.innerHTML = dropdowns + `<div class="pt-2">${renderSearchButton(previewSelections, 'onclick="showToast(\'Search (preview)\')"')}</div>`;
+      const lastBtn = enabledEl.querySelector('button');
       if (lastBtn) lastBtn.classList.add('w-full');
     }
 
@@ -505,8 +517,12 @@
     function handleGlobalToggle() {
       ymmEnabled = document.getElementById('enableToggle').checked;
       updateAdminPreview();
-      showToast(ymmEnabled ? 'Year Make Model Enabled' : 'Year Make Model Disabled');
+      showToast(ymmEnabled ? 'Year Make Model Search Enabled' : 'Year Make Model Search Disabled');
     }
+
+    function openImageModal() { document.getElementById('imageModal').classList.remove('hidden'); }
+    function closeImageModal() { document.getElementById('imageModal').classList.add('hidden'); }
+
 
     function handleValueTypeChange() {
       const type = document.getElementById('valueTypeSelect').value;
@@ -700,9 +716,9 @@
 
       const renderSections = (sections) => sections.map(sec => `
         <div class="space-y-4">
-          ${widgetPlacement && widgetPlacement.sec === sec.id && widgetPlacement.pos === 'top' ? renderWidgetUI(filteredProducts, isHP) : ''}
+          ${widgetPlacement && widgetPlacement.sec === sec.id && widgetPlacement.pos === 'top' && isYMMEnabled ? renderWidgetUI(filteredProducts, isHP) : ''}
           ${sec.html}
-          ${widgetPlacement && widgetPlacement.sec === sec.id && widgetPlacement.pos === 'bottom' ? renderWidgetUI(filteredProducts, isHP) : ''}
+          ${widgetPlacement && widgetPlacement.sec === sec.id && widgetPlacement.pos === 'bottom' && isYMMEnabled ? renderWidgetUI(filteredProducts, isHP) : ''}
         </div>
       `).join('');
 
@@ -711,13 +727,13 @@
           <div class="space-y-16 max-w-6xl mx-auto pb-20">
             ${renderSections([
               { id: 's-hero', html: `<section id="s-hero" class="relative group border-2 border-transparent hover:border-blue-300 p-20 bg-gray-900 text-white rounded-[2.5rem] text-center">
-                ${renderAddButtons('s-hero', isYMMEnabled)}
+                ${isYMMEnabled ? renderAddButtons('s-hero', true) : ''}
                 <h1 class="text-5xl font-extrabold mb-6">Expert Parts for Your Drive</h1>
                 <p class="text-gray-400 mb-10 max-w-2xl mx-auto text-lg leading-relaxed">Shop millions of parts from top brands. Guaranteed fitment when you provide your vehicle details.</p>
               </section>` },
               { id: 's-categories', html: `<section class="grid grid-cols-4 gap-6">${['Braking','Engine','Lighting','Suspension'].map(cat => `<div class="bg-white border rounded-2xl p-6 hover:shadow-md transition-shadow cursor-pointer"><div class="w-12 h-12 bg-red-50 text-red-600 rounded-lg flex items-center justify-center mb-4"><i class="fas fa-cog"></i></div><h4 class="font-bold">${cat}</h4><p class="text-xs text-gray-500 mt-1">Browse ${cat} parts</p></div>`).join('')}</section>` },
               { id: 's-promo', html: `<section id="s-promo" class="relative group border-2 border-transparent hover:border-blue-300 p-12 bg-[#b60000] text-white rounded-[2.5rem] flex items-center justify-between">
-                ${renderAddButtons('s-promo', isYMMEnabled)}
+                ${isYMMEnabled ? renderAddButtons('s-promo', true) : ''}
                 <div class="max-w-md"><h2 class="text-3xl font-bold mb-4">Summer Maintenance Sale</h2><p class="opacity-90 mb-6">Get up to 20% off on all engine filters and spark plugs this month.</p><button class="bg-white text-[#b60000] px-6 py-2 rounded-full font-bold text-sm">Shop Sale</button></div><div class="hidden md:block text-8xl opacity-20"><i class="fas fa-tools"></i></div>
               </section>` },
               { id: 's-info', html: `<section class="text-center"><h2 class="text-2xl font-bold mb-10">Why Choose Us?</h2><div class="grid grid-cols-3 gap-12"><div class="space-y-3"><div class="text-3xl text-red-600"><i class="fas fa-shipping-fast"></i></div><h3 class="font-bold">Fast Shipping</h3><p class="text-sm text-gray-500">Same day processing on all orders placed before 2 PM.</p></div><div class="space-y-3"><div class="text-3xl text-red-600"><i class="fas fa-award"></i></div><h3 class="font-bold">OEM Quality</h3><p class="text-sm text-gray-500">We only stock certified parts from trusted global manufacturers.</p></div><div class="space-y-3"><div class="text-3xl text-red-600"><i class="fas fa-handshake"></i></div><h3 class="font-bold">Expert Advice</h3><p class="text-sm text-gray-500">Talk to a real mechanic any time you need help with your installation.</p></div></div></section>` }
@@ -753,7 +769,7 @@
           return values.map(v => `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-[11px] rounded-full border">${cfg.label}: ${v}</span>`);
         }).join('');
 
-        frame.innerHTML = `<div class="max-w-7xl mx-auto space-y-8">${renderWidgetUI(mockProducts, false)}<div class="flex gap-10"><aside class="w-64 shrink-0 space-y-8">${filterSections}</aside><div class="flex-1"><div class="flex items-center justify-between mb-8 pb-4 border-b"><div class="space-y-2"><div class="border border-gray-200 bg-white rounded-lg px-3 py-2 flex flex-wrap gap-2 min-h-[42px]">${selectedChips || '<span class="text-[11px] text-gray-400">No filters selected</span>'}</div><div class="text-[12px] text-gray-500">${filteredProducts.length} items found</div></div><div class="flex items-center gap-3"><span class="text-sm text-gray-500">Sort by:</span><select class="border-none bg-transparent text-sm font-semibold focus:ring-0 cursor-pointer"><option>Relevance</option><option>Price: Low to High</option><option>Price: High to Low</option></select></div></div><div class="grid grid-cols-4 gap-6">${filteredProducts.length > 0 ? filteredProducts.map(p => `<div class="bg-white border rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow"><div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-5xl"><i class="fas fa-image"></i></div><div class="p-4 flex-1 flex flex-col"><div class="text-[10px] text-red-600 font-bold mb-1 uppercase tracking-widest">${p.vendor}</div><div class="font-bold text-sm mb-4 h-10 overflow-hidden line-clamp-2">${p.title}</div><div class="mt-auto flex items-center justify-between pt-4 border-t"><span class="font-extrabold text-lg">$${(Math.random() * 100 + 50).toFixed(2)}</span><button class="bg-gray-900 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"><i class="fas fa-plus text-xs"></i></button></div></div></div>`).join('') : `<div class="col-span-4 py-32 text-center"><div class="text-5xl text-gray-200 mb-4"><i class="fas fa-search"></i></div><h3 class="text-lg font-bold text-gray-400">No exact matches found</h3><p class="text-sm text-gray-400">Try broadening your search criteria.</p></div>`}</div></div></div></div>`;
+        frame.innerHTML = `<div class="max-w-7xl mx-auto space-y-8">${isYMMEnabled ? renderWidgetUI(mockProducts, false) : ''}<div class="flex gap-10"><aside class="w-64 shrink-0 space-y-8">${filterSections}</aside><div class="flex-1"><div class="flex items-center justify-between mb-8 pb-4 border-b"><div class="space-y-2"><div class="border border-gray-200 bg-white rounded-lg px-3 py-2 flex flex-wrap gap-2 min-h-[42px]">${selectedChips || '<span class="text-[11px] text-gray-400">No filters selected</span>'}</div><div class="text-[12px] text-gray-500">${filteredProducts.length} items found</div></div><div class="flex items-center gap-3"><span class="text-sm text-gray-500">Sort by:</span><select class="border-none bg-transparent text-sm font-semibold focus:ring-0 cursor-pointer"><option>Relevance</option><option>Price: Low to High</option><option>Price: High to Low</option></select></div></div><div class="grid grid-cols-4 gap-6">${filteredProducts.length > 0 ? filteredProducts.map(p => `<div class="bg-white border rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow"><div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-5xl"><i class="fas fa-image"></i></div><div class="p-4 flex-1 flex flex-col"><div class="text-[10px] text-red-600 font-bold mb-1 uppercase tracking-widest">${p.vendor}</div><div class="font-bold text-sm mb-4 h-10 overflow-hidden line-clamp-2">${p.title}</div><div class="mt-auto flex items-center justify-between pt-4 border-t"><span class="font-extrabold text-lg">$${(Math.random() * 100 + 50).toFixed(2)}</span><button class="bg-gray-900 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"><i class="fas fa-plus text-xs"></i></button></div></div></div>`).join('') : `<div class="col-span-4 py-32 text-center"><div class="text-5xl text-gray-200 mb-4"><i class="fas fa-search"></i></div><h3 class="text-lg font-bold text-gray-400">No exact matches found</h3><p class="text-sm text-gray-400">Try broadening your search criteria.</p></div>`}</div></div></div></div>`;
       }
     }
 
