@@ -81,30 +81,8 @@
           <h1 class="text-[20px] font-semibold">Year Make Model</h1>
           <p class="text-[12px] text-[#6d7175] mt-1">Year Make Model Guideline <span class="font-semibold underline">here</span></p>
 
-          <!-- Notification box: white bg, black text, expanded by default, extra top spacing -->
-          <div class="mt-6 mb-4 bg-white border border-[#e2e2e5] rounded-lg overflow-hidden shadow-sm" id="notificationBox">
-            <button onclick="toggleNotification()" class="w-full flex items-center justify-between p-3 text-[13px] font-medium text-[#303030] hover:bg-[#f6f6f7]">
-              <div class="flex items-center gap-2">
-                <i class="fas fa-info-circle"></i>
-                <span>Important: How to set up your Year Make Model search</span>
-              </div>
-              <i class="fas fa-chevron-up transition-transform" id="notiChevron"></i>
-            </button>
-            <div id="notiContent" class="px-10 pb-4 text-[13px] text-[#303030] space-y-3">
-              <p><span class="font-semibold">Step 1:</span> Enabled Year Make Model by switch button below</p>
-              <p><span class="font-semibold">Step 2:</span> Go to Theme Editor &gt; HomePage &gt; Add Section &gt; Apps &gt; Year Make Model &gt; Save</p>
-              <div>
-                <button onclick="showToast('Opening Theme Editor...')" class="bg-black text-white px-3 py-1.5 rounded text-[12px] font-medium hover:bg-[#1a1a1a]">
-                  Add YMM Widget in Theme Editor
-                </button>
-              </div>
-              <p><span class="font-semibold">Step 3:</span> Ensure your products have the corresponding metafields assigned.</p>
-              <p><span class="font-semibold">Step 4:</span> Add the YMM options in the list below to match your product attributes.</p>
-              <p><span class="font-semibold">Step 5:</span> Use the preview on the right to see how it will appear to your customers.</p>
-            </div>
-          </div>
-
-          <div class="bg-white border border-[#e2e2e5] rounded-lg p-4 mb-6 flex items-center justify-between shadow-sm">
+          <!-- Enable Year Make Model toggle (moved above notification box) -->
+          <div class="mt-6 bg-white border border-[#e2e2e5] rounded-lg p-4 mb-4 flex items-center justify-between shadow-sm">
             <div>
               <div class="font-medium text-[14px]">Enable Year Make Model</div>
               <p class="text-[12px] text-[#6d7175]">Turn on to display the search widget on your storefront.</p>
@@ -113,6 +91,49 @@
               <input type="checkbox" id="enableToggle" class="sr-only peer" checked onchange="handleGlobalToggle()">
               <div class="w-10 h-5 bg-[#e2e2e5] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#008060]"></div>
             </label>
+          </div>
+
+          <!-- Notification box: Quick Setup Guide -->
+          <div class="mb-6 bg-white border border-[#e2e2e5] rounded-lg overflow-hidden shadow-sm" id="notificationBox">
+            <button onclick="toggleNotification()" class="w-full flex items-center justify-between p-3 text-[13px] font-medium text-[#303030] hover:bg-[#f6f6f7]">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-info-circle"></i>
+                <span>Important: Quick Setup Guide for Year Make Model Search</span>
+              </div>
+              <i class="fas fa-chevron-up transition-transform" id="notiChevron"></i>
+            </button>
+            <div id="notiContent" class="px-10 pb-5 pt-1 text-[13px] text-[#303030] grid grid-cols-1 md:grid-cols-2 gap-6 divide-y md:divide-y-0 md:divide-x divide-[#e2e2e5]">
+              <div class="space-y-2 pt-4 md:pt-0 md:pr-6">
+                <p class="font-semibold text-[14px]">1. Add YMM Widget to Your Store <a href="#" class="text-blue-600 underline font-normal text-[13px]">(Guideline here)</a></p>
+                <p class="pl-3"><span class="font-semibold">Step 1:</span> Enable Year Make Model</p>
+                <div class="pl-3">
+                  <p class="mb-1"><span class="font-semibold">Step 2:</span> Choose Applied Theme:</p>
+                  <select id="themeSelect" class="border border-[#e2e2e5] rounded px-2 py-1.5 text-[13px] bg-white min-w-[220px] focus:outline-none focus:border-[#303030]">
+                    <option value="">Choose your theme</option>
+                    <option value="dawn">Dawn (Live)</option>
+                    <option value="horizon">Horizon</option>
+                    <option value="eclit">Eclit</option>
+                    <option value="craft">Craft</option>
+                    <option value="sense">Sense</option>
+                    <option value="studio">Studio</option>
+                  </select>
+                </div>
+                <p class="pl-3"><span class="font-semibold">Step 3:</span> Add the YMM widget:<br>
+                  <span class="text-[#6d7175]">Theme Editor → Homepage → Add Section → Apps → Year Make Model → Save</span>
+                </p>
+                <div class="pl-3 pt-1">
+                  <button onclick="showToast('Opening Theme Editor...')" class="bg-black text-white px-3 py-1.5 rounded text-[12px] font-medium hover:bg-[#1a1a1a]">
+                    Add YMM Widget
+                  </button>
+                </div>
+              </div>
+              <div class="space-y-2 pt-4 md:pt-0 md:pl-6">
+                <p class="font-semibold text-[14px]">2. Configure YMM Options <a href="#" class="text-blue-600 underline font-normal text-[13px]">(Guideline here)</a></p>
+                <p class="pl-3"><span class="font-semibold">Step 1:</span> Assign the correct attribute sources to your products.</p>
+                <p class="pl-3"><span class="font-semibold">Step 2:</span> Add your Year / Make / Model options below.</p>
+                <p class="pl-3"><span class="font-semibold">Step 3:</span> Check the live preview on the right.</p>
+              </div>
+            </div>
           </div>
 
           <div class="grid grid-cols-12 gap-6">
@@ -134,6 +155,7 @@
                   <tbody id="ymmTableBody"></tbody>
                 </table>
               </div>
+              <p class="text-[12px] text-[#6d7175] mt-2">If you need help with YMM set up, <a href="#" class="text-blue-600 underline font-semibold">contact us</a></p>
             </div>
 
             <div class="col-span-4">
