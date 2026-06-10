@@ -94,11 +94,33 @@
             </label>
           </div>
 
-          <div class="grid grid-cols-12 gap-6 mt-6">
-            <div class="col-span-8 space-y-4">
+          <!-- Widget settings + YMM Options + Preview — single grid -->
+          <div class="grid grid-cols-12 gap-6 mt-4 items-start">
+          <div class="col-span-8 space-y-4">
+          <div class="bg-white border border-[#e2e2e5] rounded-lg p-4 shadow-sm">
+            <!-- Widget title row -->
+            <div class="flex items-center justify-between">
+              <div class="font-medium text-[14px]">Widget title</div>
+              <input type="text" id="widgetTitleInput" placeholder="Find parts for your vehicle"
+                class="border border-[#e2e2e5] rounded px-3 py-1.5 text-[13px] w-64 focus:outline-none focus:border-[#303030]"
+                oninput="handleWidgetTitleChange(this.value)">
+            </div>
+            <div class="border-t border-[#e2e2e5] my-4"></div>
+            <!-- Remember vehicle selection row -->
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-[14px]">Remember vehicle selection</div>
+                <p class="text-[12px] text-[#6d7175]">Persist the selected vehicle across sessions.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="rememberVehicleToggle" class="sr-only peer" onchange="handleRememberVehicleToggle()">
+                <div class="w-10 h-5 bg-[#e2e2e5] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#008060]"></div>
+              </label>
+            </div>
+          </div>
               <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm flex flex-col">
                 <div class="p-4 border-b flex items-center justify-between">
-                  <h2 class="font-semibold text-[14px]">YMM Options</h2>
+                  <h2 class="font-semibold text-[14px]">Year Make Model Options</h2>
                   <button onclick="showAddView()" class="bg-white border px-3 py-1.5 rounded text-[12px] font-medium hover:bg-gray-50">+ Add Option</button>
                 </div>
                 <table class="w-full text-left text-[13px]">
@@ -162,19 +184,18 @@
                 </div>
               </div>
             </div>
-
-            <div class="col-span-4">
-              <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm sticky top-6 overflow-hidden">
-                <div class="p-4 bg-gray-50 font-semibold text-[14px] text-center">Preview</div>
-                <div class="border-b border-[#e2e2e5]"></div>
-                <div class="p-5" id="previewContainer">
-                  <div id="previewDisabled" class="hidden flex-col items-center py-10 text-center">
-                    <p class="text-[12px] text-gray-500">Widget is disabled</p>
-                  </div>
-                  <div id="previewEnabled" class="space-y-4"></div>
+          <div class="col-span-4">
+            <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm sticky top-6 overflow-hidden">
+              <div class="p-4 bg-gray-50 font-semibold text-[14px] text-center">Preview</div>
+              <div class="border-b border-[#e2e2e5]"></div>
+              <div class="p-5" id="previewContainer">
+                <div id="previewDisabled" class="hidden flex-col items-center py-10 text-center">
+                  <p class="text-[12px] text-gray-500">Widget is disabled</p>
                 </div>
+                <div id="previewEnabled" class="space-y-4"></div>
               </div>
             </div>
+          </div>
           </div>
         </div>
 
@@ -303,6 +324,9 @@
     let configuredOptions = window.configuredOptionsData || [];
 
     let ymmEnabled = true;
+    let widgetTitle = '';
+    let rememberVehicle = false;
+    let vehicleHistory = [];
     let previewSelections = {};
     let storefrontSelections = {};
     let searchPageFilters = {};
@@ -518,6 +542,28 @@
       ymmEnabled = document.getElementById('enableToggle').checked;
       updateAdminPreview();
       showToast(ymmEnabled ? 'Year Make Model Search Enabled' : 'Year Make Model Search Disabled');
+    }
+
+    function handleWidgetTitleChange(val) {
+      widgetTitle = val;
+      updateAdminPreview();
+    }
+
+    function handleRememberVehicleToggle() {
+      rememberVehicle = document.getElementById('rememberVehicleToggle').checked;
+      if (rememberVehicle) {
+        try { vehicleHistory = JSON.parse(localStorage.getItem('ymmVehicleHistory') || '[]'); } catch(e) { vehicleHistory = []; }
+      } else {
+        vehicleHistory = [];
+      }
+      renderStorefront();
+    }
+
+    function restoreVehicleHistory(idx) {
+      storefrontSelections = { ...vehicleHistory[idx].selections };
+      applyYmmToFilters();
+      currentStorePage = 'search';
+      renderStorefront();
     }
 
     function openImageModal() { document.getElementById('imageModal').classList.remove('hidden'); }
@@ -818,7 +864,7 @@
         <div class="bg-white border-2 border-[#b60000] p-6 rounded-2xl shadow-2xl relative animate-fadeIn w-full text-[#303030]">
           ${isHP ? `<button onclick="widgetPlacement=null; storefrontSelections={}; renderStorefront();" class="absolute -top-3 -right-3 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700"><i class="fas fa-times text-[10px]"></i></button>` : ''}
           <div class="flex items-center justify-between mb-5">
-            <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-car-side text-red-600"></i> My Vehicle</h3>
+            <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-car-side text-red-600"></i> ${widgetTitle || 'Find parts for your vehicle'}</h3>
             <button onclick="storefrontSelections={}; renderStorefront();" class="text-[10px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider">Reset Selection</button>
           </div>
           <div class="grid grid-cols-4 gap-4 items-end">
@@ -827,6 +873,18 @@
               <button onclick="goToSearch()" ${disabledAttr} class="w-full bg-black text-white py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors shadow-lg ${fadedClass}">SEARCH</button>
             </div>
           </div>
+          ${rememberVehicle && vehicleHistory.length > 0 ? `
+            <div class="mt-4 pt-4 border-t border-gray-100">
+              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2"><i class="fas fa-history mr-1"></i>Recent Search</p>
+              <div class="flex flex-wrap gap-2">
+                ${vehicleHistory.map((h, i) => `
+                  <button onclick="restoreVehicleHistory(${i})" class="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-[11px] text-gray-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-colors">
+                    <i class="fas fa-car text-[9px] mr-1"></i>${h.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
         </div>
       `;
     }
@@ -834,6 +892,14 @@
     function goToSearch() {
       const hasSelection = Object.values(storefrontSelections).some(v => v);
       if (!hasSelection) return;
+      if (rememberVehicle) {
+        const label = configuredOptions.map((opt, i) => storefrontSelections[i]).filter(Boolean).join(' ');
+        const entry = { label, selections: { ...storefrontSelections } };
+        vehicleHistory = vehicleHistory.filter(h => h.label !== entry.label);
+        vehicleHistory.unshift(entry);
+        vehicleHistory = vehicleHistory.slice(0, 5);
+        try { localStorage.setItem('ymmVehicleHistory', JSON.stringify(vehicleHistory)); } catch(e) {}
+      }
       applyYmmToFilters();
       currentStorePage = 'search';
       renderStorefront();
