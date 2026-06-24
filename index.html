@@ -80,7 +80,14 @@
         <div id="view-dashboard" class="view-content animate-fadeIn">
           <h1 class="text-[20px] font-semibold">Year Make Model</h1>
           <p class="text-[12px] text-[#6d7175] mt-1">Year Make Model Guideline <a href="#" class="text-blue-600 underline">here</a></p>
-          <p class="text-[12px] text-[#6d7175] mt-1">If you need help with Year Make Model set up, <a href="#" class="text-blue-600 underline font-semibold">contact us</a></p>
+
+          <div class="flex gap-2 mt-3">
+            <button onclick="switchAdminTab('settings')" id="tab-btn-settings" class="px-4 py-1.5 bg-white border border-[#303030] text-[#303030] rounded text-[13px] font-semibold hover:bg-gray-50">Settings</button>
+            <button onclick="switchAdminTab('history')" id="tab-btn-history" class="px-4 py-1.5 bg-white border border-[#e2e2e5] text-[#303030] rounded text-[13px] font-medium hover:bg-gray-50">Manage History</button>
+          </div>
+
+          <!-- Settings Tab -->
+          <div id="admin-tab-settings">
 
           <!-- Enable Year Make Model Search toggle box -->
           <div class="mt-6 bg-white border border-[#e2e2e5] rounded-lg p-4 mb-4 flex items-center justify-between shadow-sm">
@@ -98,12 +105,34 @@
           <div class="grid grid-cols-12 gap-6 mt-4 items-start">
           <div class="col-span-8 space-y-4">
           <div class="bg-white border border-[#e2e2e5] rounded-lg p-4 shadow-sm">
+            <div class="font-semibold text-[13px] text-[#6d7175] uppercase tracking-wide mb-3">YMM Widget Labels</div>
             <!-- Widget title row -->
             <div class="flex items-center justify-between">
               <div class="font-medium text-[14px]">Widget title</div>
               <input type="text" id="widgetTitleInput" placeholder="Find parts for your vehicle"
                 class="border border-[#e2e2e5] rounded px-3 py-1.5 text-[13px] w-64 focus:outline-none focus:border-[#303030]"
                 oninput="handleWidgetTitleChange(this.value)">
+            </div>
+            <div class="border-t border-[#e2e2e5] my-3"></div>
+            <div class="flex items-center justify-between">
+              <div class="font-medium text-[14px]">Select...</div>
+              <input type="text" id="widgetSelectInput" placeholder="Select..."
+                class="border border-[#e2e2e5] rounded px-3 py-1.5 text-[13px] w-64 focus:outline-none focus:border-[#303030]"
+                oninput="handleWidgetSelectChange(this.value)">
+            </div>
+            <div class="border-t border-[#e2e2e5] my-3"></div>
+            <div class="flex items-center justify-between">
+              <div class="font-medium text-[14px]">Search</div>
+              <input type="text" id="widgetSearchInput" placeholder="SEARCH"
+                class="border border-[#e2e2e5] rounded px-3 py-1.5 text-[13px] w-64 focus:outline-none focus:border-[#303030]"
+                oninput="handleWidgetSearchChange(this.value)">
+            </div>
+            <div class="border-t border-[#e2e2e5] my-3"></div>
+            <div class="flex items-center justify-between">
+              <div class="font-medium text-[14px]">Reset Selection</div>
+              <input type="text" id="widgetResetInput" placeholder="Reset Selection"
+                class="border border-[#e2e2e5] rounded px-3 py-1.5 text-[13px] w-64 focus:outline-none focus:border-[#303030]"
+                oninput="handleWidgetResetChange(this.value)">
             </div>
             <div class="border-t border-[#e2e2e5] my-4"></div>
             <!-- Remember vehicle selection row -->
@@ -196,6 +225,37 @@
               </div>
             </div>
           </div>
+          </div>
+          </div><!-- end admin-tab-settings -->
+
+          <!-- Manage History Tab -->
+          <div id="admin-tab-history" class="hidden animate-fadeIn mt-6">
+            <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm overflow-hidden">
+              <div class="p-4 border-b flex items-center justify-between">
+                <h2 class="font-semibold text-[16px]">YMM Search History</h2>
+                <div class="flex gap-2">
+                  <button onclick="showTop5()" class="bg-white border border-[#e2e2e5] px-3 py-1.5 rounded text-[12px] font-medium hover:bg-gray-50 flex items-center gap-1.5">
+                    <i class="fas fa-trophy text-[10px] text-yellow-500"></i> Top 5 Combinations
+                  </button>
+                  <button onclick="clearHistory()" class="bg-white border border-[#e2e2e5] px-3 py-1.5 rounded text-[12px] font-medium text-red-600 hover:bg-red-50">Clear History</button>
+                </div>
+              </div>
+              <div class="overflow-auto" style="max-height:420px;">
+                <table class="text-left text-[13px]" style="min-width:100%;">
+                  <thead class="bg-[#f9f9f9] border-b sticky top-0 z-10">
+                    <tr id="historyTableHead"></tr>
+                  </thead>
+                  <tbody id="historyTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="top5Panel" class="hidden mt-4 bg-white border border-[#e2e2e5] rounded-lg shadow-sm overflow-hidden">
+              <div class="p-4 border-b flex items-center gap-2">
+                <i class="fas fa-trophy text-yellow-500 text-[13px]"></i>
+                <h3 class="font-semibold text-[14px]">Top 5 Most Searched Combinations</h3>
+              </div>
+              <div id="top5List" class="p-4 divide-y"></div>
+            </div>
           </div>
         </div>
 
@@ -325,8 +385,13 @@
 
     let ymmEnabled = true;
     let widgetTitle = '';
+    let widgetSelectPlaceholder = '';
+    let widgetSearchLabel = '';
+    let widgetResetLabel = '';
     let rememberVehicle = false;
     let vehicleHistory = [];
+    let ymmSearchHistory = [];
+    let activeAdminTab = 'settings';
     let previewSelections = {};
     let storefrontSelections = {};
     let searchPageFilters = {};
@@ -448,6 +513,87 @@
       return options;
     }
 
+    function switchAdminTab(tab) {
+      activeAdminTab = tab;
+      document.getElementById('admin-tab-settings').classList.toggle('hidden', tab !== 'settings');
+      document.getElementById('admin-tab-history').classList.toggle('hidden', tab !== 'history');
+      const s = document.getElementById('tab-btn-settings');
+      const h = document.getElementById('tab-btn-history');
+      s.classList.toggle('border-[#303030]', tab === 'settings');
+      s.classList.toggle('font-semibold', tab === 'settings');
+      s.classList.toggle('border-[#e2e2e5]', tab !== 'settings');
+      s.classList.toggle('font-medium', tab !== 'settings');
+      h.classList.toggle('border-[#303030]', tab === 'history');
+      h.classList.toggle('font-semibold', tab === 'history');
+      h.classList.toggle('border-[#e2e2e5]', tab !== 'history');
+      h.classList.toggle('font-medium', tab !== 'history');
+      if (tab === 'history') renderHistoryTab();
+    }
+
+    function handleWidgetSelectChange(val) { widgetSelectPlaceholder = val; updateAdminPreview(); renderStorefront(); }
+    function handleWidgetSearchChange(val) { widgetSearchLabel = val; updateAdminPreview(); renderStorefront(); }
+    function handleWidgetResetChange(val) { widgetResetLabel = val; updateAdminPreview(); renderStorefront(); }
+
+    function renderHistoryTab() {
+      const head = document.getElementById('historyTableHead');
+      const body = document.getElementById('historyTableBody');
+      if (!head || !body) return;
+      if (configuredOptions.length === 0) {
+        head.innerHTML = '<th class="p-3 text-left text-[12px] font-medium text-[#6d7175]">—</th>';
+        body.innerHTML = '<tr><td class="p-6 text-center text-[13px] text-[#6d7175]">No YMM options configured yet.</td></tr>';
+        return;
+      }
+      head.innerHTML = configuredOptions.map(opt => `<th class="p-3 text-left text-[12px] font-medium whitespace-nowrap">${opt.label}</th>`).join('');
+      if (ymmSearchHistory.length === 0) {
+        body.innerHTML = `<tr><td class="p-6 text-center text-[13px] text-[#6d7175]" colspan="${configuredOptions.length}">No search history yet. Records appear here when users search using the YMM widget.</td></tr>`;
+        return;
+      }
+      body.innerHTML = ymmSearchHistory.map((entry, idx) => `
+        <tr class="border-b hover:bg-gray-50 ${idx % 2 === 0 ? '' : 'bg-[#fafafa]'}">
+          ${entry.values.map(v => `<td class="p-3 text-[13px] whitespace-nowrap">${v || '<span class="text-gray-300">—</span>'}</td>`).join('')}
+        </tr>
+      `).join('');
+    }
+
+    function showTop5() {
+      const panel = document.getElementById('top5Panel');
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) renderTop5();
+    }
+
+    function renderTop5() {
+      const list = document.getElementById('top5List');
+      if (ymmSearchHistory.length === 0) {
+        list.innerHTML = '<p class="text-[13px] text-[#6d7175] py-2">No search history yet.</p>';
+        return;
+      }
+      const counts = {};
+      ymmSearchHistory.forEach(entry => {
+        const key = entry.values.filter(v => v).join(' › ');
+        if (key) counts[key] = (counts[key] || 0) + 1;
+      });
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      if (sorted.length === 0) { list.innerHTML = '<p class="text-[13px] text-[#6d7175] py-2">No complete searches recorded yet.</p>'; return; }
+      list.innerHTML = sorted.map(([combo, count], idx) => `
+        <div class="flex items-center justify-between py-2.5">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-[#303030] text-white text-[10px] flex items-center justify-center font-bold shrink-0">${idx + 1}</span>
+            <span class="text-[13px]">${combo}</span>
+          </div>
+          <span class="text-[12px] font-semibold text-[#6d7175] shrink-0 ml-4">${count}×</span>
+        </div>
+      `).join('');
+    }
+
+    function clearHistory() {
+      if (!confirm('Clear all search history?')) return;
+      ymmSearchHistory = [];
+      renderHistoryTab();
+      const panel = document.getElementById('top5Panel');
+      if (panel && !panel.classList.contains('hidden')) { panel.classList.add('hidden'); }
+      showToast('History cleared');
+    }
+
     function switchView(viewId) {
       document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
       document.getElementById('view-' + viewId).classList.remove('hidden');
@@ -503,7 +649,7 @@
       const hasSelection = Object.values(selections).some(v => v);
       const fadedClass = hasSelection ? '' : 'opacity-40 cursor-not-allowed';
       const disabledAttr = hasSelection ? '' : 'disabled';
-      return `<button ${onclickAttr} ${disabledAttr} class="bg-black text-white py-2.5 px-4 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors ${fadedClass}">SEARCH</button>`;
+      return `<button ${onclickAttr} ${disabledAttr} class="bg-black text-white py-2.5 px-4 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors ${fadedClass}">${widgetSearchLabel || 'SEARCH'}</button>`;
     }
 
     function updateAdminPreview() {
@@ -521,7 +667,7 @@
           <div class="space-y-1">
             <label class="text-[11px] font-bold text-gray-400 uppercase tracking-tight">${opt.label}</label>
             <select onchange="handleAdminPreviewChange(${i}, this.value)" ${!active ? 'disabled' : ''} class="w-full border rounded-lg px-2 py-2 text-[12px] bg-white outline-none disabled:bg-gray-50">
-              <option value="">Select ${opt.label}</option>
+              <option value="">${widgetSelectPlaceholder || 'Select'}</option>
               ${options.length === 0 ? '<option value="" disabled>No options available</option>' : options.map(o => `<option value="${o}" ${previewSelections[i] === o ? 'selected' : ''}>${o}</option>`).join('')}
             </select>
           </div>
@@ -853,7 +999,7 @@
           <div class="space-y-1.5 text-left">
             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">${opt.label}</label>
             <select onchange="handleStorefrontChange(${i}, this.value)" ${!active ? 'disabled' : ''} class="w-full border-gray-200 border rounded-xl px-3 py-2.5 text-[12px] bg-white outline-none focus:ring-2 focus:ring-red-100 disabled:bg-gray-50 transition-all cursor-pointer">
-              <option value="">Choose ${opt.label}</option>
+              <option value="">${widgetSelectPlaceholder || 'Select'}</option>
               ${options.length === 0 ? '<option value="" disabled>No options available</option>' : options.map(o => `<option value="${o}" ${storefrontSelections[i] === o ? 'selected' : ''}>${o}</option>`).join('')}
             </select>
           </div>
@@ -865,12 +1011,12 @@
           ${isHP ? `<button onclick="widgetPlacement=null; storefrontSelections={}; renderStorefront();" class="absolute -top-3 -right-3 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700"><i class="fas fa-times text-[10px]"></i></button>` : ''}
           <div class="flex items-center justify-between mb-5">
             <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-car-side text-red-600"></i> ${widgetTitle || 'Find parts for your vehicle'}</h3>
-            <button onclick="storefrontSelections={}; renderStorefront();" class="text-[10px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider">Reset Selection</button>
+            <button onclick="storefrontSelections={}; renderStorefront();" class="text-[10px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider">${widgetResetLabel || 'Reset Selection'}</button>
           </div>
           <div class="grid grid-cols-4 gap-4 items-end">
             ${dropdowns}
             <div>
-              <button onclick="goToSearch()" ${disabledAttr} class="w-full bg-black text-white py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors shadow-lg ${fadedClass}">SEARCH</button>
+              <button onclick="goToSearch()" ${disabledAttr} class="w-full bg-black text-white py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors shadow-lg ${fadedClass}">${widgetSearchLabel || 'SEARCH'}</button>
             </div>
           </div>
           ${rememberVehicle && vehicleHistory.length > 0 ? `
@@ -892,6 +1038,7 @@
     function goToSearch() {
       const hasSelection = Object.values(storefrontSelections).some(v => v);
       if (!hasSelection) return;
+      ymmSearchHistory.unshift({ values: configuredOptions.map((opt, i) => storefrontSelections[i] || '') });
       if (rememberVehicle) {
         const label = configuredOptions.map((opt, i) => storefrontSelections[i]).filter(Boolean).join(' ');
         const entry = { label, selections: { ...storefrontSelections } };
